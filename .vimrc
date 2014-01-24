@@ -1,12 +1,16 @@
 "
-" A very basic .vimrc
+" A basic .vimrc
 "
 
-set ruler
-set cmdheight=2
+" Tabbing
+set expandtab
+set smarttab
+set shiftwidth=4
+set tabstop=4
 
-set backspace=eol,start,indent
-set whichwrap+=<,>,h,l
+" Indentation
+set autoindent
+set cindent
 
 " Searching
 set ignorecase
@@ -17,28 +21,44 @@ set incsearch
 set showmatch
 set mat=2
 
-set noerrorbells
+" Backspace
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" Ignore compiled files for tab completion
+set wildignore=*.o,*~,*.pyc
+if has("win16") || has("win32")
+    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+else
+    set wildignore+=.git\*,.hg\*,.svn\*
+endif
+
+set wildmenu
+set wildmode=longest,list
+
+" Display
+set ruler
+set cmdheight=2
+set number
+"set noerrorbells
+set history=700
 
 " Syntax color
 syntax enable
 colorscheme desert
 set background=dark
 
-set encoding=utf8
+if has("gui_running")
+	if has("win32")
+		set guifont=Consolas:h10
+	endif
+endif
+
+"set encoding=utf8
 
 " No backup files (version control can handle that)
 set nobackup
 set nowb
 set noswapfile
-
-" Tabbing
-set expandtab
-set smarttab
-set shiftwidth=4
-set tabstop=4
-
-" Indentation
-set ai
-set si
 
 map <leader>pp :setlocal paste!<cr>
