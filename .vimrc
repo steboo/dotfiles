@@ -1,5 +1,5 @@
 "
-" A basic .vimrc
+" .vimrc
 "
 
 " Tabbing
@@ -11,7 +11,7 @@ set tabstop=4
 " Indentation
 set autoindent
 set cindent
-set wrap
+set wrap " Wrap lines
 
 " Searching
 set ignorecase
@@ -21,7 +21,7 @@ set hlsearch
 
 " Matching braces
 set showmatch
-set mat=2
+set matchtime=2
 
 " Backspace
 set backspace=eol,start,indent
@@ -90,6 +90,14 @@ set fileformats=unix,dos,mac
 " Change to current file's directory
 set autochdir
 
+" Use PowerShell for commands on Windows
+if has("win32")
+    set shell=powershell\ -NoLogo
+    set shellcmdflag=-Command
+    set shellquote=\"
+    set shellxquote=
+endif
+
 " No backup files (version control can handle that)
 " Most people seem to set no writebackup, but I don't see the value in that
 set nobackup
@@ -115,3 +123,5 @@ function! DisplayColorSchemes()
    endfor
    exec "cd " . currDir
 endfunction
+
+set secure
