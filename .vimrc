@@ -11,7 +11,9 @@ set tabstop=4
 " Indentation
 set autoindent
 set cindent
-set wrap " Wrap lines
+
+" Wrap lines
+set wrap
 
 " Searching
 set ignorecase
@@ -57,23 +59,31 @@ if has("gui_running")
     set background=light
     let g:solarized_termcolors=256
 	if has("win32")
-		set guifont=Consolas:h10
+		set guifont=Consolas:h11
+        set guioptions-=m
+        set guioptions-=L
 	endif
 else
     " Let vim figure out the correct value of t_Co
+    " (check value of $TERM if there are less colors than expected)
     set background=dark
     let g:solarized_termcolors=&t_Co
 endif
 
-" Colors need to be in ~/.vim/colors (or %USERPROFILE\vimfiles\colors)
-" Fall back to something built-in if it's missing
-try
-    colorscheme solarized
-    "colorscheme molokai
-    "colorscheme badwolf
-catch /^Vim\%((\a\+)\)\=:E185/
-    colorscheme desert
-endtry
+if !has("gui_running") && (has("win16") || has("win32"))
+    " External vim color schemes are generally not working with vim in cmd or PowerShell
+    colorscheme pablo
+else
+    " Colors need to be in ~/.vim/colors (or %USERPROFILE\vimfiles\colors)
+    " Fall back to something built-in if it's missing
+    try
+        colorscheme solarized
+        "colorscheme molokai
+        "colorscheme badwolf
+    catch /^Vim\%((\a\+)\)\=:E185/
+        colorscheme desert
+    endtry
+endif
 
 " Allow mouse in all modes if it's supported
 " (Hold down shift to copy)
