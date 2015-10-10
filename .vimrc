@@ -61,8 +61,9 @@ if has("gui_running")
 		set guifont=Consolas:h10
 	endif
 else
+    " Let vim figure out the correct value of t_Co
     set background=dark
-    let g:solarized_termcolors=16
+    let g:solarized_termcolors=&t_Co
 endif
 
 " Colors need to be in ~/.vim/colors (or %USERPROFILE\vimfiles\colors)
@@ -77,7 +78,7 @@ endtry
 
 " Allow mouse in all modes if it's supported
 if has("mouse")
-    set mouse=a
+    set mouse=v
     set mousehide
 endif
 
