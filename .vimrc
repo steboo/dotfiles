@@ -42,13 +42,12 @@ else
 endif
 
 set wildmenu
-set wildmode=longest,list
+set wildmode=list:longest
 
 " Display
 set ruler
 set cmdheight=2
 set number " Line numbers
-"set noerrorbells
 set visualbell
 set history=700
 
@@ -77,8 +76,9 @@ catch /^Vim\%((\a\+)\)\=:E185/
 endtry
 
 " Allow mouse in all modes if it's supported
+" (Hold down shift to copy)
 if has("mouse")
-    set mouse=v
+    set mouse=a
     set mousehide
 endif
 
@@ -106,30 +106,13 @@ if has("win32")
 endif
 
 " No backup files (version control can handle that)
-" Most people seem to set nowritebackup, but I don't see the value in that
 set nobackup
 set noswapfile
+
+" Backup the file only during writing
 set writebackup
 
 " Shortcut for setting paste mode
 map <leader>pp :setlocal paste!<cr>
-
-" Fun function to show all the color schemes
-" call DisplayColorSchemes()
-" http://stackoverflow.com/a/26074629
-function! DisplayColorSchemes()
-   let currDir = getcwd()
-   exec "cd $VIMRUNTIME/colors"
-   for myCol in split(glob("*"), '\n')
-      if myCol =~ '\.vim'
-         let mycol = substitute(myCol, '\.vim', '', '')
-         exec "colorscheme " . mycol
-         exec "redraw!"
-         echo "colorscheme = ". myCol
-         sleep 2
-      endif
-   endfor
-   exec "cd " . currDir
-endfunction
 
 set secure
