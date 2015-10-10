@@ -23,6 +23,12 @@ set hlsearch
 set showmatch
 set matchtime=2
 
+" Folding
+set foldenable
+set foldmethod=indent
+set foldlevelstart=10 " Open folds by default
+set foldnestmax=10
+
 " Backspace
 set backspace=eol,start,indent
 set whichwrap+=<,>,h,l
@@ -99,9 +105,10 @@ if has("win32")
 endif
 
 " No backup files (version control can handle that)
-" Most people seem to set no writebackup, but I don't see the value in that
+" Most people seem to set nowritebackup, but I don't see the value in that
 set nobackup
 set noswapfile
+set writebackup
 
 " Shortcut for setting paste mode
 map <leader>pp :setlocal paste!<cr>
