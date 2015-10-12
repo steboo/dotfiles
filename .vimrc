@@ -12,7 +12,8 @@ set tabstop=4
 set autoindent
 set cindent
 
-" Use indent files
+" Use filetype detection and plugin/indent files
+filetype plugin on
 filetype indent on
 
 " Wrap lines
@@ -29,10 +30,12 @@ set showmatch
 set matchtime=2
 
 " Folding
-set foldenable
-set foldmethod=indent
-set foldlevelstart=10 " Open folds by default
-set foldnestmax=10
+if has("folding")
+    set foldenable
+    set foldmethod=indent
+    set foldlevelstart=10 " Open folds by default
+    set foldnestmax=10
+endif
 
 " Sane backspace behavior
 set backspace=indent,eol,start
@@ -53,7 +56,6 @@ set wildmode=list:longest
 
 " Display
 set ruler
-set cmdheight=2
 set number " Line numbers
 set visualbell
 set history=700
@@ -67,8 +69,13 @@ if has("gui_running")
     set t_Co=256
     if has("gui_win32")
         set guifont=Consolas:h11
+
+        " Turn off menu in gvim
         set guioptions-=m
-        set guioptions-=L
+
+        " Turn off scrollbars in gvim
+        set guioptions+=Llrb
+        set guioptions-=Llrb
     endif
 else
     " Dark background in terminal
@@ -81,6 +88,7 @@ endif
 if !has("gui_running") && has("win32")
     " External vim color schemes are generally not working in cmd or PowerShell
     colorscheme pablo
+    set nocursorline
 else
     if &t_Co == 256
         " I don't typically change terminal colors, and the README for
@@ -96,6 +104,7 @@ else
         "colorscheme badwolf
     catch /^Vim\%((\a\+)\)\=:E185/
         colorscheme desert
+        set nocursorline
     endtry
 endif
 
@@ -119,10 +128,7 @@ set nobomb
 " <char> <BS> <char>
 set nodigraph
 
-set fileformats=unix,dos,mac
-
-" Change to current file's directory
-set autochdir
+set fileformats=unix,dos
 
 " Use PowerShell for commands on Windows
 if has("win32")
@@ -130,6 +136,11 @@ if has("win32")
     set shellcmdflag=-Command
     set shellquote=\"
     set shellxquote=
+endif
+
+" Change to current file's directory
+if exists("+autochdir")
+  set autochdir
 endif
 
 " No backup files (version control can handle that)
