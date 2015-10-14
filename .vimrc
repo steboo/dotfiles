@@ -1,8 +1,11 @@
-"
 " .vimrc
-"
+" 2015-10-13
 
-" Tabbing
+" -----------------
+" Editor behavior
+" -----------------
+
+" Tabs or whitespace
 set expandtab
 set smarttab
 set shiftwidth=4
@@ -10,20 +13,76 @@ set tabstop=4
 
 " Indentation
 set autoindent
-set cindent
+if has("cindent")
+    set cindent
+elseif has("smartindent")
+    set smartindent
+endif
 
 " Use filetype detection and plugin/indent files
 filetype plugin on
 filetype indent on
 
-" Wrap lines
-set wrap
 
-" Searching
+" --------------
+" Line endings
+" --------------
+
+set fileformats=unix,dos
+
+
+" -----------------
+" Search behavior
+" -----------------
+
 set ignorecase
 set smartcase
-set incsearch
-set hlsearch
+if has("extra_search")
+    set incsearch
+    set hlsearch
+endif
+
+
+" ----------
+" Controls
+" ----------
+
+" Sane backspace behavior
+set backspace=indent,eol,start
+
+" Allow arrow keys to wrap
+set whichwrap+=<,>
+
+" Ignore compiled files for tab completion
+if has("wildignore")
+    set wildignore=*.o,*~,*.pyc
+    if has("win32")
+        set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+    else
+        set wildignore+=.git\*,.hg\*,.svn\*
+    endif
+endif
+if has("wildmenu")
+    set wildmenu
+endif
+set wildmode=list:longest
+
+" Set nodigraph to avoid entering unexpected characters when pressing
+" <char> <BS> <char>
+if has("digraphs")
+    set nodigraph
+endif
+
+
+" -----------------
+" Visual behavior
+" -----------------
+
+" Visually wrap lines
+set wrap
+if has("linebreak")
+    set linebreak
+endif
 
 " Matching braces
 set showmatch
@@ -37,76 +96,94 @@ if has("folding")
     set foldnestmax=10
 endif
 
-" Sane backspace behavior
-set backspace=indent,eol,start
-
-" Allow arrow keys to wrap
-set whichwrap+=<,>
-
-" Ignore compiled files for tab completion
-set wildignore=*.o,*~,*.pyc
-if has("win32")
-    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
-else
-    set wildignore+=.git\*,.hg\*,.svn\*
+" Misc display
+if has("cmdline_info")
+    set ruler
 endif
-
-set wildmenu
-set wildmode=list:longest
-
-" Display
-set ruler
 set number " Line numbers
 set visualbell
 set history=700
 set cursorline
+
+" gvim settings
+if has("gui")
+    if has("win32")
+        set guifont=Consolas:h11
+    endif
+
+    " Turn off menu tearoffs
+    set guioptions-=t
+
+    " Turn off scrollbars
+    set guioptions-=r
+    set guioptions-=R
+    set guioptions-=l
+    set guioptions-=L
+    set guioptions-=b
+endif
 
 " Syntax color
 syntax enable
 if has("gui_running")
     " Light background in GUI
     set background=light
-    set t_Co=256
-    if has("gui_win32")
-        set guifont=Consolas:h11
 
-        " Turn off menu in gvim
-        set guioptions-=m
+    " Turn off solarized menu
+    let g:solarized_menu=0
 
-        " Turn off scrollbars in gvim
-        set guioptions+=Llrb
-        set guioptions-=Llrb
-    endif
+    " Use solarized light for GUI
+    colorscheme solarized
 else
     " Dark background in terminal
     set background=dark
 
     " Let vim figure out the correct value of t_Co
     " (Hint: check value of $TERM if there are less colors than expected)
-endif
 
-if !has("gui_running") && has("win32")
-    " External vim color schemes are generally not working in cmd or PowerShell
-    colorscheme pablo
-    set nocursorline
-else
-    if &t_Co == 256
-        " I don't typically change terminal colors, and the README for
-        " Solarized recommends that this should be set:
-        let g:solarized_termcolors=256
-    endif
+    if &t_Co < 256
+        " Use a basic color scheme for terminals lacking in colors
+        try
+            colorscheme pablo
+        catch /^Vim\%((\a\+)\)\=:E185/
+        endtry
 
-    " Colors need to be in ~/.vim/colors (or %USERPROFILE\vimfiles\colors)
-    " Fall back to something built-in if it's missing
-    try
-        colorscheme solarized
-        "colorscheme molokai
-        "colorscheme badwolf
-    catch /^Vim\%((\a\+)\)\=:E185/
-        colorscheme desert
+        " cursorline looks terrible with low colors
         set nocursorline
-    endtry
+    else
+        if &t_Co == 256
+            " I don't typically change terminal colors, and the README for
+            " solarized recommends that this should be set:
+            let g:solarized_termcolors=256
+        endif
+
+        " Colors need to be in ~/.vim/colors (or %USERPROFILE\vimfiles\colors)
+        " Fall back to something built-in if it's missing
+        try
+            " solarized dark does not have high enough contrast for me
+            "colorscheme solarized
+
+            " molokai and badwolf use bold fonts which do not work nicely in PuTTY with Consolas + ClearType
+            " (Note: PuTTY can be patched, see http://stackoverflow.com/a/2581889/25295)
+            "colorscheme molokai
+            "colorscheme badwolf
+
+            "colorscheme Tomorrow-Night
+            colorscheme railscast
+        catch /^Vim\%((\a\+)\)\=:E185/
+            try
+                colorscheme pablo
+            catch /^Vim\%((\a\+)\)\=:E185/
+            endtry
+
+            set nocursorline
+        endtry
+    endif
 endif
+
+
+" -------
+" Mouse
+" -------
 
 " Allow mouse in all modes if it's supported
 " (Hold down shift to copy)
@@ -115,20 +192,28 @@ if has("mouse")
     set mousehide
 endif
 
+
+" ----------
+" Encoding
+" ----------
+
 " Set encoding to UTF-8 on Windows
 " On Linux, this will default to something based on $LANG (typically UTF-8)
-if has("win32")
-    set encoding=utf-8
+if has("multi_byte")
+    if has("win32")
+        set encoding=utf-8
+    endif
+
+    " Prepending a BOM in utf-8 is rarely a good idea
+    if &encoding == "utf-8"
+        set nobomb
+    endif
 endif
 
-" Prepending a BOM is rarely a good idea
-set nobomb
 
-" Set nodigraph to avoid entering unexpected characters when pressing
-" <char> <BS> <char>
-set nodigraph
-
-set fileformats=unix,dos
+" ----------------
+" Shell commands
+" ----------------
 
 " Use PowerShell for commands on Windows
 if has("win32")
@@ -138,17 +223,24 @@ if has("win32")
     set shellxquote=
 endif
 
-" Change to current file's directory
-if exists("+autochdir")
-  set autochdir
-endif
 
-" No backup files (version control can handle that)
-set nobackup
-set noswapfile
+" ---------------
+" Miscellaneous
+" ---------------
 
 " Backup the file only during writing
-set writebackup
+set nobackup
+if has("writebackup")
+    set writebackup
+endif
+
+" Put swap files somewhere else to avoid cluttering the current directory
+if has("unix")
+    set swapfile
+    set directory=~/.vim/tmp//,$HOME/tmp//,/tmp//,/var/temp//,.
+else
+    set noswapfile
+endif
 
 " Shortcut for setting paste mode
 map <leader>pp :setlocal paste!<cr>
