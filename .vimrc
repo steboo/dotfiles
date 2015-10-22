@@ -1,5 +1,5 @@
 " .vimrc
-" 2015-10-13
+" 2015-10-21
 
 " -----------------
 " Editor behavior
@@ -55,7 +55,7 @@ set whichwrap+=<,>
 
 " Ignore compiled files for tab completion
 if has("wildignore")
-    set wildignore=*.o,*~,*.pyc
+    set wildignore=*.o,*~,*.pyc,*.pyo
     if has("win32")
         set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
     else
@@ -65,7 +65,7 @@ endif
 if has("wildmenu")
     set wildmenu
 endif
-set wildmode=list:longest
+set wildmode=longest:full
 
 " Set nodigraph to avoid entering unexpected characters when pressing
 " <char> <BS> <char>
@@ -162,7 +162,8 @@ else
             " solarized dark does not have high enough contrast for me
             "colorscheme solarized
 
-            " molokai and badwolf use bold fonts which do not work nicely in PuTTY with Consolas + ClearType
+            " molokai and badwolf use bold fonts which do not display nicely in
+            " PuTTY with Consolas + ClearType
             " (Note: PuTTY can be patched, see http://stackoverflow.com/a/2581889/25295)
             "colorscheme molokai
             "colorscheme badwolf
@@ -185,11 +186,16 @@ endif
 " Mouse
 " -------
 
-" Allow mouse in all modes if it's supported
+" Allow mouse in all modes except insert if it's supported
 " (Hold down shift to copy)
 if has("mouse")
-    set mouse=a
+    set mouse=nvc
     set mousehide
+
+    " Resize buffers with mouse in tmux/screen
+    if &term == "screen-256color"
+        set ttymouse=xterm2
+    endif
 endif
 
 
@@ -235,6 +241,8 @@ if has("writebackup")
 endif
 
 " Put swap files somewhere else to avoid cluttering the current directory
+" A trailing slash for the location makes vim use the full path name in the
+" file name.
 if has("unix")
     set swapfile
     set directory=~/.vim/tmp//,$HOME/tmp//,/tmp//,/var/temp//,.
@@ -244,5 +252,7 @@ endif
 
 " Shortcut for setting paste mode
 map <leader>pp :setlocal paste!<cr>
+
+map <F1> <nop>
 
 set secure
