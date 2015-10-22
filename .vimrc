@@ -169,7 +169,7 @@ else
             "colorscheme badwolf
 
             "colorscheme Tomorrow-Night
-            colorscheme railscast
+            colorscheme railscasts
         catch /^Vim\%((\a\+)\)\=:E185/
             try
                 colorscheme pablo
