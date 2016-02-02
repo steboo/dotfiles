@@ -1,5 +1,5 @@
 " .vimrc
-" 2016-02-01
+" Last modified: 2016-02-01
 
 " -----------------
 " Editor behavior
@@ -107,82 +107,53 @@ set visualbell
 set history=700
 set cursorline
 
-" gvim settings
-if has("gui")
-    if has("win32")
-        set guifont=Consolas:h11
-    endif
-
-    " Turn off menu tearoffs
-    set guioptions-=t
-
-    " Turn off scrollbars
-    set guioptions-=r
-    set guioptions-=R
-    set guioptions-=l
-    set guioptions-=L
-    set guioptions-=b
-endif
-
 " Syntax color
 syntax enable
-if has("gui_running")
-    " Light background in GUI
-    set background=light
+" Dark background in terminal
+set background=dark
 
-    " Turn off solarized menu
-    let g:solarized_menu=0
+" Let vim figure out the correct value of t_Co
+" (Hint: check value of $TERM if there are less colors than expected)
 
-    " Use solarized light for GUI
-    colorscheme solarized
+if &t_Co < 256
+    " Use a basic color scheme for terminals lacking in colors
+    try
+        colorscheme pablo
+    catch /^Vim\%((\a\+)\)\=:E185/
+    endtry
+
+    " cursorline looks terrible with low colors
+    set nocursorline
 else
-    " Dark background in terminal
-    set background=dark
+    if &t_Co == 256
+        " I don't typically change terminal colors, and the README for
+        " solarized recommends that this should be set:
+        let g:solarized_termcolors=256
+    endif
 
-    " Let vim figure out the correct value of t_Co
-    " (Hint: check value of $TERM if there are less colors than expected)
+    " Colors need to be in ~/.vim/colors (or %USERPROFILE%\vimfiles\colors)
+    " Fall back to something built-in if it's missing
+    try
+        " solarized dark does not have high enough contrast for me
+        "colorscheme solarized
 
-    if &t_Co < 256
-        " Use a basic color scheme for terminals lacking in colors
+        " molokai and badwolf use bold fonts which do not display nicely in
+        " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
+        " http://stackoverflow.com/a/2581889/25295)
+        "colorscheme molokai
+        "colorscheme badwolf
+
+        "colorscheme Tomorrow-Night
+        colorscheme railscasts
+    catch /^Vim\%((\a\+)\)\=:E185/
         try
             colorscheme pablo
         catch /^Vim\%((\a\+)\)\=:E185/
         endtry
 
-        " cursorline looks terrible with low colors
         set nocursorline
-    else
-        if &t_Co == 256
-            " I don't typically change terminal colors, and the README for
-            " solarized recommends that this should be set:
-            let g:solarized_termcolors=256
-        endif
-
-        " Colors need to be in ~/.vim/colors (or %USERPROFILE%\vimfiles\colors)
-        " Fall back to something built-in if it's missing
-        try
-            " solarized dark does not have high enough contrast for me
-            "colorscheme solarized
-
-            " molokai and badwolf use bold fonts which do not display nicely in
-            " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
-            " http://stackoverflow.com/a/2581889/25295)
-            "colorscheme molokai
-            "colorscheme badwolf
-
-            "colorscheme Tomorrow-Night
-            colorscheme railscasts
-        catch /^Vim\%((\a\+)\)\=:E185/
-            try
-                colorscheme pablo
-            catch /^Vim\%((\a\+)\)\=:E185/
-            endtry
-
-            set nocursorline
-        endtry
-    endif
+    endtry
 endif
-
 
 " -------
 " Mouse
