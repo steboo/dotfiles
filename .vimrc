@@ -1,5 +1,5 @@
 " .vimrc
-" 2015-10-21
+" 2016-02-01
 
 " -----------------
 " Editor behavior
@@ -28,6 +28,7 @@ filetype indent on
 " Line endings
 " --------------
 
+" Default to Unix line endings generally
 set fileformats=unix,dos
 
 
@@ -68,7 +69,7 @@ endif
 set wildmode=longest:full
 
 " Set nodigraph to avoid entering unexpected characters when pressing
-" <char> <BS> <char>
+" <char> <BS> <char>.
 if has("digraphs")
     set nodigraph
 endif
@@ -100,6 +101,7 @@ endif
 if has("cmdline_info")
     set ruler
 endif
+
 set number " Line numbers
 set visualbell
 set history=700
@@ -156,15 +158,15 @@ else
             let g:solarized_termcolors=256
         endif
 
-        " Colors need to be in ~/.vim/colors (or %USERPROFILE\vimfiles\colors)
+        " Colors need to be in ~/.vim/colors (or %USERPROFILE%\vimfiles\colors)
         " Fall back to something built-in if it's missing
         try
             " solarized dark does not have high enough contrast for me
             "colorscheme solarized
 
             " molokai and badwolf use bold fonts which do not display nicely in
-            " PuTTY with Consolas + ClearType
-            " (Note: PuTTY can be patched, see http://stackoverflow.com/a/2581889/25295)
+            " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
+            " http://stackoverflow.com/a/2581889/25295)
             "colorscheme molokai
             "colorscheme badwolf
 
@@ -193,7 +195,7 @@ if has("mouse")
     set mousehide
 
     " Resize buffers with mouse in tmux/screen
-    if &term == "screen-256color"
+    if &term ==# "screen-256color"
         set ttymouse=xterm2
     endif
 endif
@@ -203,16 +205,27 @@ endif
 " Encoding
 " ----------
 
-" Set encoding to UTF-8 on Windows
-" On Linux, this will default to something based on $LANG (typically UTF-8)
+" On Windows, encoding will default to latin1 (code page 1252). To support
+" Unicode files, we'll want to change this to something in Unicode.
+" On Linux, encoding will default to something based on $LANG (typically utf-8)
 if has("multi_byte")
-    if has("win32")
+    if has("gui_gtk2")
+        " The help file recommends setting the encoding for GTK+ 2 to utf-8.
+        set encoding=utf-8
+    elseif has("win32")
+        " The internal Windows encoding is utf-16le, but the internal vim
+        " encoding is utf-8. This value of encoding will also serve as the
+        " default to fileencoding for new files. For that reason, utf-8 is
+        " best.
         set encoding=utf-8
     endif
 
-    " Prepending a BOM in utf-8 is rarely a good idea
-    if &encoding == "utf-8"
+    " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
+    " recommended for other multi-byte encodings
+    if &fileencoding == "utf-8" || (&fileencoding == "" && &encoding == "utf-8")
         set nobomb
+    else
+        set bomb
     endif
 endif
 
