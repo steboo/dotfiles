@@ -38,10 +38,8 @@ if has('multi_byte')
 
     " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
     " recommended for other multi-byte encodings
-    if &fileencoding ==# 'utf-8' || (&fileencoding ==# '' && &encoding ==# 'utf-8')
+    if &encoding ==# 'utf-8'
         set nobomb
-    else
-        set bomb
     endif
 endif
 
@@ -120,8 +118,8 @@ endif
 " Show trailing characters, but don't show anything for non-trailing tabs
 " (Hint: to use a Unicode character, vim must be using a Unicode encoding.)
 if has('multi_byte') && &encoding ==# 'utf-8'
-	set list
-	set listchars=tab:\ \ ,trail:·
+    set list
+    set listchars=tab:\ \ ,trail:·
 endif
 
 " Matching braces
@@ -146,6 +144,7 @@ set number " Line numbers
 set visualbell
 set history=1000
 set cursorline
+set scrolloff=3
 
 " Syntax color
 if has('syntax')
@@ -164,7 +163,7 @@ if &t_Co < 256
 
     " cursorline looks terrible with low colors
     set nocursorline
-	set laststatus=1
+    set laststatus=1
 else
     if &t_Co == 256
         " Since I don't typically change terminal colors, the README for
@@ -193,7 +192,7 @@ else
         endtry
 
         set nocursorline
-		set laststatus=1
+        set laststatus=1
     endtry
 endif
 
@@ -245,13 +244,17 @@ if has('unix')
     set swapfile
     set directory=~/.vim/tmp//,$HOME/tmp//,.
 else
+    " The risk of running into long path issues on Windows is not worth
+    " using swapfiles
     set noswapfile
 endif
 
 " Shortcut for setting paste mode
 map <leader>pp :setlocal paste!<cr>
 
+" Avoid accidentally opening up a help window
 map <F1> <nop>
+imap <F1> <nop>
 
 " Load machine-specific settings
 if filereadable(expand('~/.vimrc.local'))
