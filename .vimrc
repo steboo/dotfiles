@@ -19,9 +19,19 @@ elseif has("smartindent")
     set smartindent
 endif
 
+" Pathogen - https://github.com/tpope/vim-pathogen
+if has("win32")
+    if filereadable(expand("~\\vimfiles\\autoload\\pathogen.vim"))
+        execute pathogen#infect()
+    endif
+else
+    if filereadable(expand("~/.vim/autoload/pathogen.vim"))
+        execute pathogen#infect()
+    endif
+endif
+
 " Use filetype detection and plugin/indent files
-filetype plugin on
-filetype indent on
+filetype plugin indent on
 
 
 " --------------
@@ -56,12 +66,7 @@ set whichwrap+=<,>
 
 " Ignore compiled files for tab completion
 if has("wildignore")
-    set wildignore=*.o,*~,*.pyc,*.pyo
-    if has("win32")
-        set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
-    else
-        set wildignore+=.git\*,.hg\*,.svn\*
-    endif
+    set wildignore+=*.o,*~,*.pyc,*.pyo
 endif
 if has("wildmenu")
     set wildmenu
@@ -104,11 +109,14 @@ endif
 
 set number " Line numbers
 set visualbell
-set history=700
+set history=1000
 set cursorline
 
 " Syntax color
-syntax enable
+if has("syntax")
+    syntax enable
+endif
+
 " Dark background in terminal
 set background=dark
 
@@ -131,7 +139,7 @@ else
         let g:solarized_termcolors=256
     endif
 
-    " Colors need to be in ~/.vim/colors (or %USERPROFILE%\vimfiles\colors)
+    " Colors need to be in ~/.vim/colors (or %HOME%\vimfiles\colors)
     " Fall back to something built-in if it's missing
     try
         " solarized dark does not have high enough contrast for me
