@@ -1,7 +1,7 @@
 " .gvimrc
 " Last modified: 2016-02-03
 
-if has("win32")
+if has('win32')
     set guifont=Consolas:h11
 endif
 
@@ -25,3 +25,4 @@ let g:solarized_menu=0
 colorscheme solarized
 
 set cursorline
+set laststatus=2

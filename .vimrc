@@ -13,9 +13,9 @@ set tabstop=4
 
 " Indentation
 set autoindent
-if has("cindent")
+if has('cindent')
     set cindent
-elseif has("smartindent")
+elseif has('smartindent')
     set smartindent
 endif
 
@@ -27,18 +27,18 @@ endif
 " On Windows, encoding will default to latin1 (code page 1252). To support
 " Unicode files, we'll want to change this to something in Unicode.
 " On Linux, encoding will default to something based on $LANG (typically utf-8)
-if has("multi_byte")
-    if has("gui_gtk2")
+if has('multi_byte')
+    if has('gui_gtk2')
         " The help file recommends setting the encoding for GTK+ 2 to utf-8.
         set encoding=utf-8
-    elseif &encoding ==# "latin1"
+    elseif &encoding ==# 'latin1'
         " We want vim to support Unicode.
         set encoding=utf-8
     endif
 
     " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
     " recommended for other multi-byte encodings
-    if &fileencoding ==# "utf-8" || (&fileencoding ==# "" && &encoding ==# "utf-8")
+    if &fileencoding ==# 'utf-8' || (&fileencoding ==# '' && &encoding ==# 'utf-8')
         set nobomb
     else
         set bomb
@@ -51,9 +51,9 @@ endif
 " ---------
 
 " Pathogen - https://github.com/tpope/vim-pathogen
-if has("win32") && filereadable(expand("~\\vimfiles\\autoload\\pathogen.vim"))
+if has('win32') && filereadable(expand('~\\vimfiles\\autoload\\pathogen.vim'))
     execute pathogen#infect()
-elseif filereadable(expand("~/.vim/autoload/pathogen.vim"))
+elseif filereadable(expand('~/.vim/autoload/pathogen.vim'))
     execute pathogen#infect()
 endif
 
@@ -75,7 +75,7 @@ set fileformats=unix,dos
 
 set ignorecase
 set smartcase
-if has("extra_search")
+if has('extra_search')
     set incsearch
     set hlsearch
 endif
@@ -90,7 +90,7 @@ set backspace=indent,eol,start
 
 " Set nodigraph to avoid entering unexpected characters when pressing
 " <char> <BS> <char>. Some systems default digraph to on.
-if has("digraphs")
+if has('digraphs')
     set nodigraph
 endif
 
@@ -98,10 +98,10 @@ endif
 set whichwrap+=<,>
 
 " Ignore compiled files for tab completion
-if has("wildignore")
+if has('wildignore')
     set wildignore+=*.o,*~,*.pyc,*.pyo
 endif
-if has("wildmenu")
+if has('wildmenu')
     set wildmenu
 endif
 set wildmode=longest:full
@@ -113,15 +113,15 @@ set wildmode=longest:full
 
 " Visually wrap lines
 set wrap
-if has("linebreak")
+if has('linebreak')
     set linebreak
 endif
 
 " Show trailing characters, but don't show anything for non-trailing tabs
 " (Hint: to use a Unicode character, vim must be using a Unicode encoding.)
-if has("multi_byte") && &encoding ==# "utf-8"
-    set list
-    set listchars=tab:\ \ ,trail:·
+if has('multi_byte') && &encoding ==# 'utf-8'
+	set list
+	set listchars=tab:\ \ ,trail:·
 endif
 
 " Matching braces
@@ -129,7 +129,7 @@ set showmatch
 set matchtime=2
 
 " Folding
-if has("folding")
+if has('folding')
     set foldenable
     set foldmethod=indent
     set foldlevelstart=10 " Open folds by default
@@ -137,7 +137,7 @@ if has("folding")
 endif
 
 " Misc display
-if has("cmdline_info")
+if has('cmdline_info')
     set ruler
 endif
 
@@ -148,12 +148,9 @@ set history=1000
 set cursorline
 
 " Syntax color
-if has("syntax")
+if has('syntax')
     syntax enable
 endif
-
-" Dark background in terminal
-"set background=dark
 
 " Let vim figure out the correct value of t_Co
 " (Hint: check value of $TERM if there are less colors than expected)
@@ -167,7 +164,7 @@ if &t_Co < 256
 
     " cursorline looks terrible with low colors
     set nocursorline
-    set laststatus=1
+	set laststatus=1
 else
     if &t_Co == 256
         " Since I don't typically change terminal colors, the README for
@@ -196,7 +193,7 @@ else
         endtry
 
         set nocursorline
-        set laststatus=1
+		set laststatus=1
     endtry
 endif
 
@@ -207,12 +204,12 @@ endif
 
 " Allow mouse in all modes except insert if it's supported
 " (Hold down shift to copy)
-if has("mouse")
+if has('mouse')
     set mouse=nvc
     set mousehide
 
     " Resize buffers with mouse in tmux/screen
-    if &term ==# "screen-256color"
+    if &term ==# 'screen-256color'
         set ttymouse=xterm2
     endif
 endif
@@ -223,7 +220,7 @@ endif
 " ----------------
 
 " Use PowerShell for commands on Windows
-if has("win32")
+if has('win32')
     set shell=powershell\ -NoLogo
     set shellcmdflag=-Command
     set shellquote=\"
@@ -237,14 +234,14 @@ endif
 
 " Backup the file only during writing
 set nobackup
-if has("writebackup")
+if has('writebackup')
     set writebackup
 endif
 
 " Put swap files somewhere else to avoid cluttering the current directory
 " A trailing slash for the location makes vim use the full path name in the
 " file name.
-if has("unix")
+if has('unix')
     set swapfile
     set directory=~/.vim/tmp//,$HOME/tmp//,.
 else
@@ -257,11 +254,11 @@ map <leader>pp :setlocal paste!<cr>
 map <F1> <nop>
 
 " Load machine-specific settings
-if filereadable(expand("~/.vimrc.local"))
+if filereadable(expand('~/.vimrc.local'))
     source $HOME/.vimrc.local
-elseif has("win32") && filereadable(expand("~\\vimfiles\\vimrc.local"))
+elseif has('win32') && filereadable(expand('~\\vimfiles\\vimrc.local'))
     source $HOME/vimfiles/vimrc.local
-elseif filereadable(expand("~/.vim/vimrc.local"))
+elseif filereadable(expand('~/.vim/vimrc.local'))
     source $HOME/.vim/vimrc.local
 endif
 
