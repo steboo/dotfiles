@@ -1,22 +1,36 @@
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
   [parameter()]
   [string]
-  $TargetDirectory = $env:HOME
+  $TargetDirectory
 )
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = "Stop"
 
-# Backup existing
-if (Test-Path $TargetDirectory\_vimrc) {
-  Copy-Item $TargetDirectory\_vimrc $TargetDirectory\_vimrc.bak
+# Set default target directory if not set
+if (!$TargetDirectory) {
+    if (Test-Path Env:\HOME) {
+        $TargetDirectory = "$env:HOME\vimfiles"
+    } elseif ((Test-Path Env:\HOMEDRIVE) -and (Test-Path Env:\HOMEPATH)) {
+        $TargetDirectory = "$env:HOMEDRIVE$env:HOMEPATH\vimfiles"
+    }
 }
 
-if (Test-Path $TargetDirectory\_gvimrc) {
-  Copy-Item $TargetDirectory\_gvimrc $TargetDirectory\_gvimrc.bak
+if (-not (Test-Path $TargetDirectory)) {
+    mkdir $TargetDirectory
+}
+
+# Backup existing
+if (Test-Path $TargetDirectory\vimrc) {
+  Copy-Item $TargetDirectory\vimrc $TargetDirectory\vimrc.bak
+}
+
+if (Test-Path $TargetDirectory\gvimrc) {
+  Copy-Item $TargetDirectory\gvimrc $TargetDirectory\gvimrc.bak
 }
 
 # Copy new files
-Copy-Item .vimrc $TargetDirectory\_vimrc
-Copy-Item .gvimrc $TargetDirectory\_gvimrc
+Copy-Item .vimrc $TargetDirectory\vimrc
+Copy-Item .gvimrc $TargetDirectory\gvimrc
 
 "Copied files to $TargetDirectory"
