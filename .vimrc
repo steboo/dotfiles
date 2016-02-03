@@ -1,5 +1,5 @@
 " .vimrc
-" Last modified: 2016-02-01
+" Last modified: 2016-02-03
 
 " -----------------
 " Editor behavior
@@ -19,15 +19,42 @@ elseif has("smartindent")
     set smartindent
 endif
 
+
+" ----------
+" Encoding
+" ----------
+
+" On Windows, encoding will default to latin1 (code page 1252). To support
+" Unicode files, we'll want to change this to something in Unicode.
+" On Linux, encoding will default to something based on $LANG (typically utf-8)
+if has("multi_byte")
+    if has("gui_gtk2")
+        " The help file recommends setting the encoding for GTK+ 2 to utf-8.
+        set encoding=utf-8
+    elseif &encoding ==# "latin1"
+        " We want vim to support Unicode.
+        set encoding=utf-8
+    endif
+
+    " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
+    " recommended for other multi-byte encodings
+    if &fileencoding ==# "utf-8" || (&fileencoding ==# "" && &encoding ==# "utf-8")
+        set nobomb
+    else
+        set bomb
+    endif
+endif
+
+
+" ---------
+" Plugins
+" ---------
+
 " Pathogen - https://github.com/tpope/vim-pathogen
-if has("win32")
-    if filereadable(expand("~\\vimfiles\\autoload\\pathogen.vim"))
-        execute pathogen#infect()
-    endif
-else
-    if filereadable(expand("~/.vim/autoload/pathogen.vim"))
-        execute pathogen#infect()
-    endif
+if has("win32") && filereadable(expand("~\\vimfiles\\autoload\\pathogen.vim"))
+    execute pathogen#infect()
+elseif filereadable(expand("~/.vim/autoload/pathogen.vim"))
+    execute pathogen#infect()
 endif
 
 " Use filetype detection and plugin/indent files
@@ -61,6 +88,12 @@ endif
 " Sane backspace behavior
 set backspace=indent,eol,start
 
+" Set nodigraph to avoid entering unexpected characters when pressing
+" <char> <BS> <char>. Some systems default digraph to on.
+if has("digraphs")
+    set nodigraph
+endif
+
 " Allow arrow keys to wrap
 set whichwrap+=<,>
 
@@ -73,12 +106,6 @@ if has("wildmenu")
 endif
 set wildmode=longest:full
 
-" Set nodigraph to avoid entering unexpected characters when pressing
-" <char> <BS> <char>.
-if has("digraphs")
-    set nodigraph
-endif
-
 
 " -----------------
 " Visual behavior
@@ -88,6 +115,13 @@ endif
 set wrap
 if has("linebreak")
     set linebreak
+endif
+
+" Show trailing characters, but don't show anything for non-trailing tabs
+" (Hint: to use a Unicode character, vim must be using a Unicode encoding.)
+if has("multi_byte") && &encoding ==# "utf-8"
+    set list
+    set listchars=tab:\ \ ,trail:·
 endif
 
 " Matching braces
@@ -107,6 +141,7 @@ if has("cmdline_info")
     set ruler
 endif
 
+set laststatus=2 " Consistent status bar
 set number " Line numbers
 set visualbell
 set history=1000
@@ -118,7 +153,7 @@ if has("syntax")
 endif
 
 " Dark background in terminal
-set background=dark
+"set background=dark
 
 " Let vim figure out the correct value of t_Co
 " (Hint: check value of $TERM if there are less colors than expected)
@@ -132,9 +167,10 @@ if &t_Co < 256
 
     " cursorline looks terrible with low colors
     set nocursorline
+    set laststatus=1
 else
     if &t_Co == 256
-        " I don't typically change terminal colors, and the README for
+        " Since I don't typically change terminal colors, the README for
         " solarized recommends that this should be set:
         let g:solarized_termcolors=256
     endif
@@ -160,8 +196,10 @@ else
         endtry
 
         set nocursorline
+        set laststatus=1
     endtry
 endif
+
 
 " -------
 " Mouse
@@ -176,35 +214,6 @@ if has("mouse")
     " Resize buffers with mouse in tmux/screen
     if &term ==# "screen-256color"
         set ttymouse=xterm2
-    endif
-endif
-
-
-" ----------
-" Encoding
-" ----------
-
-" On Windows, encoding will default to latin1 (code page 1252). To support
-" Unicode files, we'll want to change this to something in Unicode.
-" On Linux, encoding will default to something based on $LANG (typically utf-8)
-if has("multi_byte")
-    if has("gui_gtk2")
-        " The help file recommends setting the encoding for GTK+ 2 to utf-8.
-        set encoding=utf-8
-    elseif has("win32")
-        " The internal Windows encoding is utf-16le, but the internal vim
-        " encoding is utf-8. This value of encoding will also serve as the
-        " default to fileencoding for new files. For that reason, utf-8 is
-        " best.
-        set encoding=utf-8
-    endif
-
-    " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
-    " recommended for other multi-byte encodings
-    if &fileencoding == "utf-8" || (&fileencoding == "" && &encoding == "utf-8")
-        set nobomb
-    else
-        set bomb
     endif
 endif
 
@@ -237,7 +246,7 @@ endif
 " file name.
 if has("unix")
     set swapfile
-    set directory=~/.vim/tmp//,$HOME/tmp//,/tmp//,/var/temp//,.
+    set directory=~/.vim/tmp//,$HOME/tmp//,.
 else
     set noswapfile
 endif
@@ -246,5 +255,14 @@ endif
 map <leader>pp :setlocal paste!<cr>
 
 map <F1> <nop>
+
+" Load machine-specific settings
+if filereadable(expand("~/.vimrc.local"))
+    source $HOME/.vimrc.local
+elseif has("win32") && filereadable(expand("~\\vimfiles\\vimrc.local"))
+    source $HOME/vimfiles/vimrc.local
+elseif filereadable(expand("~/.vim/vimrc.local"))
+    source $HOME/.vim/vimrc.local
+endif
 
 set secure

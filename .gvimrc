@@ -1,5 +1,5 @@
 " .gvimrc
-" Last modified: 2016-02-01
+" Last modified: 2016-02-03
 
 if has("win32")
     set guifont=Consolas:h11
@@ -25,4 +25,3 @@ let g:solarized_menu=0
 colorscheme solarized
 
 set cursorline
-
