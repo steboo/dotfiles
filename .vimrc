@@ -1,5 +1,5 @@
 " .vimrc
-" Last modified: 2016-02-03
+" Last modified: 2016-02-14
 
 " -----------------
 " Editor behavior
@@ -18,6 +18,12 @@ if has('cindent')
 elseif has('smartindent')
     set smartindent
 endif
+
+" Join comment lines
+set formatoptions+=j
+
+" Do not automatically wrap lines
+set nowrap
 
 
 " ----------
@@ -49,7 +55,7 @@ endif
 " ---------
 
 " Pathogen - https://github.com/tpope/vim-pathogen
-if has('win32') && filereadable(expand('~\\vimfiles\\autoload\\pathogen.vim'))
+if has('win32') && filereadable(expand('~/vimfiles/autoload/pathogen.vim'))
     execute pathogen#infect()
 elseif filereadable(expand('~/.vim/autoload/pathogen.vim'))
     execute pathogen#infect()
@@ -65,6 +71,11 @@ filetype plugin indent on
 
 " Default to Unix line endings generally
 set fileformats=unix,dos
+
+" Default to Unix line endings even in a new buffer on Windows
+if has('win32')
+    set fileformat=unix
+endif
 
 
 " -----------------
@@ -110,7 +121,6 @@ set wildmode=longest:full
 " -----------------
 
 " Visually wrap lines
-set wrap
 if has('linebreak')
     set linebreak
 endif
@@ -118,8 +128,11 @@ endif
 " Show trailing characters, but don't show anything for non-trailing tabs
 " (Hint: to use a Unicode character, vim must be using a Unicode encoding.)
 if has('multi_byte') && &encoding ==# 'utf-8'
-    set list
     set listchars=tab:\ \ ,trail:·
+
+    " Trailing characters are distracting while editing the current line.
+    " Instead, show them if toggled.
+    map <leader>es :setlocal list!<cr>
 endif
 
 " Matching braces
@@ -226,6 +239,13 @@ if has('win32')
     set shellxquote=
 endif
 
+" Use ag or ack for grep command if available
+if executable('ag')
+    set grepprg=ag\ --nocolor\ --nogroup\ --column
+elseif executable('ack')
+    set grepprg=ack\ -H\ --nocolor\ --nogroup
+endif
+
 
 " ---------------
 " Miscellaneous
@@ -237,16 +257,25 @@ if has('writebackup')
     set writebackup
 endif
 
+set swapfile
 " Put swap files somewhere else to avoid cluttering the current directory
 " A trailing slash for the location makes vim use the full path name in the
 " file name.
 if has('unix')
-    set swapfile
-    set directory=~/.vim/tmp//,$HOME/tmp//,.
+    set directory=~/.vim/swap//,.
 else
-    " The risk of running into long path issues on Windows is not worth
-    " using swapfiles
-    set noswapfile
+    set directory=~/vimfiles/swap//,.
+endif
+
+" Allow undo even if file is closed and reopened
+if has("persistent_undo")
+    set undofile
+
+    if has('unix')
+        set undodir=~/.vim/undo/
+    elseif has('win32')
+        set undodir=~/vimfiles/undo/
+    endif
 endif
 
 " Shortcut for setting paste mode
@@ -259,7 +288,7 @@ imap <F1> <nop>
 " Load machine-specific settings
 if filereadable(expand('~/.vimrc.local'))
     source $HOME/.vimrc.local
-elseif has('win32') && filereadable(expand('~\\vimfiles\\vimrc.local'))
+elseif has('win32') && filereadable(expand('~/vimfiles/vimrc.local'))
     source $HOME/vimfiles/vimrc.local
 elseif filereadable(expand('~/.vim/vimrc.local'))
     source $HOME/.vim/vimrc.local
