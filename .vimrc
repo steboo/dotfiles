@@ -233,7 +233,7 @@ endif
 
 " Use PowerShell for commands on Windows
 if has('win32')
-    set shell=powershell\ -NoLogo
+    set shell=$WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe\ -NoLogo
     set shellcmdflag=-Command
     set shellquote=\"
     set shellxquote=
