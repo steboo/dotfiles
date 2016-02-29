@@ -294,4 +294,7 @@ elseif filereadable(expand('~/.vim/vimrc.local'))
     source $HOME/.vim/vimrc.local
 endif
 
+" Hide swap files and backups from the file explorer
+let g:netrw_list_hide='.*\.swp$,\~$'
+
 set secure
