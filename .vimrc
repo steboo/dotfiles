@@ -1,5 +1,4 @@
 " .vimrc
-" Last modified: 2016-02-14
 
 " -----------------
 " Editor behavior
@@ -20,7 +19,9 @@ elseif has('smartindent')
 endif
 
 " Join comment lines
-set formatoptions+=j
+if v:version >= 703
+    set formatoptions+=j
+endif
 
 " Do not automatically wrap lines
 set nowrap
@@ -251,6 +252,14 @@ endif
 " Miscellaneous
 " ---------------
 
+" Don't recognize octal for CTRL-A and CTRL-X
+set nrformats-=octal
+
+" Prefer stronger encryption
+if v:version >= 703
+    set cryptmethod=blowfish
+endif
+
 " Backup the file only during writing
 set nobackup
 if has('writebackup')
@@ -285,6 +294,9 @@ map <leader>pp :setlocal paste!<cr>
 map <F1> <nop>
 imap <F1> <nop>
 
+" Hide swap files and backups from the file explorer
+let g:netrw_list_hide='.*\.swp$,\~$'
+
 " Load machine-specific settings
 if filereadable(expand('~/.vimrc.local'))
     source $HOME/.vimrc.local
@@ -293,8 +305,5 @@ elseif has('win32') && filereadable(expand('~/vimfiles/vimrc.local'))
 elseif filereadable(expand('~/.vim/vimrc.local'))
     source $HOME/.vim/vimrc.local
 endif
-
-" Hide swap files and backups from the file explorer
-let g:netrw_list_hide='.*\.swp$,\~$'
 
 set secure
