@@ -1,4 +1,15 @@
 " .vimrc
+"
+" A widely compatible vim 7+ initialization file. Useful if one needs to log
+" into a wide variety of machines that might not have all of the features that
+" exist on a primary developer machine.
+"
+" Tested on
+"  * VIM 7.0 Tiny Linux
+"  * VIM 7.2 Huge Linux
+"  * VIM 7.4 Huge Linux
+"  * VIM 7.4 Big Win32
+"  * GVIM 7.4 Big Win32
 
 " -----------------
 " Editor behavior
@@ -44,7 +55,7 @@ if has('multi_byte')
     endif
 
     " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
-    " recommended for other multi-byte encodings
+    " recommended (by me) for other multi-byte encodings
     if &encoding ==# 'utf-8'
         set nobomb
     endif
@@ -73,7 +84,7 @@ filetype plugin indent on
 " Default to Unix line endings generally
 set fileformats=unix,dos
 
-" Default to Unix line endings even in a new buffer on Windows
+" Default to Unix line endings even in a new instance on Windows
 if has('win32')
     set fileformat=unix
 endif
@@ -83,8 +94,12 @@ endif
 " Search behavior
 " -----------------
 
+" Ignore case when searching generally...
 set ignorecase
+
+" ...unless using capital letters
 set smartcase
+
 if has('extra_search')
     set incsearch
     set hlsearch
@@ -111,9 +126,11 @@ set whichwrap+=<,>
 if has('wildignore')
     set wildignore+=*.o,*~,*.pyc,*.pyo
 endif
+
 if has('wildmenu')
     set wildmenu
 endif
+
 set wildmode=longest:full
 
 
@@ -130,11 +147,11 @@ endif
 " (Hint: to use a Unicode character, vim must be using a Unicode encoding.)
 if has('multi_byte') && &encoding ==# 'utf-8'
     set listchars=tab:\ \ ,trail:·
-
-    " Trailing characters are distracting while editing the current line.
-    " Instead, show them if toggled.
-    map <leader>es :setlocal list!<cr>
 endif
+
+" Trailing characters are distracting while editing the current line.
+" Instead, show them if toggled.
+map <leader>es :setlocal list!<cr>
 
 " Matching braces
 set showmatch
@@ -215,9 +232,9 @@ endif
 " Mouse
 " -------
 
-" Allow mouse in all modes except insert if it's supported
-" (Hold down shift to copy)
 if has('mouse')
+    " Allow mouse in all modes except insert if it's supported
+    " (Hold down shift to copy)
     set mouse=nvc
     set mousehide
 
@@ -234,7 +251,7 @@ endif
 
 " Use PowerShell for commands on Windows
 if has('win32')
-    set shell=$WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe\ -NoLogo
+    set shell=$WINDIR/System32/WindowsPowerShell/v1.0/powershell.exe\ -NoLogo
     set shellcmdflag=-Command
     set shellquote=\"
     set shellxquote=
@@ -307,3 +324,5 @@ elseif filereadable(expand('~/.vim/vimrc.local'))
 endif
 
 set secure
+
+" vim:set et sw=4:

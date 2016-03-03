@@ -1,5 +1,4 @@
 " .gvimrc
-" Last modified: 2016-02-03
 
 if has('win32')
     set guifont=Consolas:h11
@@ -26,3 +25,5 @@ colorscheme solarized
 
 set cursorline
 set laststatus=2
+
+" vim:set et sw=4:
