@@ -10,6 +10,7 @@
 "  * VIM 7.4 Huge Linux
 "  * VIM 7.4 Big Win32
 "  * GVIM 7.4 Big Win32
+"  * GVIM 8.0 Huge Win32
 
 " -----------------
 " Editor behavior
@@ -30,7 +31,7 @@ elseif has('smartindent')
 endif
 
 " Join comment lines
-if v:version >= 703
+if v:version > 703 || v:version == 703 && has('patch541')
     set formatoptions+=j
 endif
 
@@ -251,7 +252,7 @@ endif
 
 " Use PowerShell for commands on Windows
 if has('win32')
-    set shell=$WINDIR/System32/WindowsPowerShell/v1.0/powershell.exe\ -NoLogo
+    set shell=$WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe\ -NoLogo
     set shellcmdflag=-Command
     set shellquote=\"
     set shellxquote=
@@ -273,7 +274,11 @@ endif
 set nrformats-=octal
 
 " Prefer stronger encryption
-if v:version >= 703
+if v:version > 704 || v:version == 704 && has('patch237') && has('patch401')
+    set cryptmethod=blowfish2
+elseif v:version >= 703
+    " vim's original 'blowfish' is not secure, but might still be better than
+    " the default of 'zip'
     set cryptmethod=blowfish
 endif
 
