@@ -2,6 +2,10 @@
 
 if has('win32')
     set guifont=Consolas:h11
+    if has('directx') && &encoding ==# 'utf-8'
+      " Enable ClearType
+      set renderoptions=directx,taamode:1
+    endif
 endif
 
 " Turn off menu tearoffs
