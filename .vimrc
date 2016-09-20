@@ -21,6 +21,7 @@ set expandtab
 set smarttab
 set shiftwidth=4
 set tabstop=4
+set textwidth=80
 
 " Indentation
 set autoindent
@@ -76,6 +77,24 @@ endif
 
 " Use filetype detection and plugin/indent files
 filetype plugin indent on
+
+if has('autocmd')
+    augroup filetype_format_exceptions
+        autocmd!
+
+        " Try to adhere to PEP-8 for Python
+        autocmd FileType python setlocal shiftwidth=4 tabstop=4 textwidth=79
+
+        " Try to adhere to PSR-2 for PHP
+        autocmd FileType php setlocal shiftwidth=4 tabstop=4 textwidth=120
+
+        " Try to adhere to perlstyle for Perl
+        autocmd FileType perl setlocal shiftwidth=4 tabstop=4
+
+        " Scala - many styleguides (Kafka, Spark, Twitter) suggest a column limit of 100
+        autocmd FileType scala setlocal textwidth=100
+    augroup END
+endif
 
 
 " --------------
@@ -315,6 +334,12 @@ map <leader>pp :setlocal paste!<cr>
 " Avoid accidentally opening up a help window
 map <F1> <nop>
 imap <F1> <nop>
+
+" Avoid accidentally opening Ex mode
+map Q <Nop>
+
+" Quicker escape
+imap kj <Esc>
 
 " Hide swap files and backups from the file explorer
 let g:netrw_list_hide='.*\.swp$,\~$'
