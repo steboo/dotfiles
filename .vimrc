@@ -19,8 +19,8 @@
 " Tabs or whitespace
 set expandtab
 set smarttab
-set shiftwidth=4
-set tabstop=4
+set shiftwidth=2
+set tabstop=2
 set textwidth=80
 
 " Indentation
