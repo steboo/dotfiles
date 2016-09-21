@@ -51,7 +51,7 @@ if has('multi_byte')
     if has('gui_gtk2')
         " The help file recommends setting the encoding for GTK+ 2 to utf-8.
         set encoding=utf-8
-    elseif &encoding ==# 'latin1'
+    elseif has('gui_running') && &encoding ==# 'latin1'
         " We want vim to support Unicode.
         set encoding=utf-8
     endif
@@ -96,6 +96,35 @@ if has('autocmd')
     augroup END
 endif
 
+if exists('g:loaded_syntastic_plugin')
+    if has('signs')
+        set signcolumn=yes
+    endif
+
+    set statusline+=%#warningmsg#
+    set statusline+=%{SyntasticStatuslineFlag()}
+    set statusline+=%*
+
+    let g:syntastic_always_populate_loc_list = 1
+    let g:syntastic_loc_list_height = 5
+    let g:syntastic_auto_loc_list = 0
+    let g:syntastic_check_on_open = 1
+    let g:syntastic_check_on_wq = 1
+
+    highlight link SyntasticErrorSign SignColumn
+    highlight link SyntasticWarningSign SignColumn
+    highlight link SyntasticStyleErrorSign SignColumn
+    highlight link SyntasticStyleWarningSign SignColumn
+
+    let g:syntastic_javascript_checkers = ['eslint']
+    if has('autocmd')
+        augroup filetype_javascript_eslint
+            autocmd!
+            autocmd FileType javascript if executable('node_modules/.bin/eslint') | let g:syntastic_javascript_eslint_exec = 'node_modules/.bin/eslint' | endif
+        augroup END
+    endif
+endif
+
 
 " --------------
 " Line endings
@@ -105,10 +134,16 @@ endif
 set fileformats=unix,dos
 
 " Default to Unix line endings even in a new instance on Windows
-if has('win32')
+if has('win32') && (v:version < 704 || v:version == 704 && !has('patch1619'))
     set fileformat=unix
 endif
 
+" Use Windows line endings in batch files
+if has('autocmd')
+    augroup filetype_endings
+        autocmd FileType dosbatch setlocal fileformat=dos
+    augroup END
+endif
 
 " -----------------
 " Search behavior
