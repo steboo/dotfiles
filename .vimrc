@@ -91,7 +91,8 @@ if has('autocmd')
         " Try to adhere to perlstyle for Perl
         autocmd FileType perl setlocal shiftwidth=4 tabstop=4
 
-        " Scala - many styleguides (Kafka, Spark, Twitter) suggest a column limit of 100
+        " Scala - many style guides (Kafka, Spark, Twitter) suggest a column
+        " limit of 100
         autocmd FileType scala setlocal textwidth=100
     augroup END
 endif
@@ -141,6 +142,7 @@ endif
 " Use Windows line endings in batch files
 if has('autocmd')
     augroup filetype_endings
+        autocmd!
         autocmd FileType dosbatch setlocal fileformat=dos
     augroup END
 endif
@@ -233,7 +235,7 @@ set cursorline
 set scrolloff=3
 
 " Syntax color
-if has('syntax')
+if has('syntax') && !exists('g:syntax_on')
     syntax enable
 endif
 
@@ -252,8 +254,8 @@ if &t_Co < 256
     set laststatus=1
 else
     if &t_Co == 256
-        " Since I don't typically change terminal colors, the README for
-        " solarized recommends that this should be set:
+        " The README for solarized recommends that this should be set for those
+        " who don't change their terminal colors.
         let g:solarized_termcolors=256
     endif
 
@@ -294,7 +296,7 @@ if has('mouse')
     set mousehide
 
     " Resize buffers with mouse in tmux/screen
-    if &term ==# 'screen-256color'
+    if has('mouse_xterm') && &term ==# 'screen-256color'
         set ttymouse=xterm2
     endif
 endif
@@ -312,11 +314,22 @@ if has('win32')
     set shellxquote=
 endif
 
-" Use ag or ack for grep command if available
-if executable('ag')
-    set grepprg=ag\ --nocolor\ --nogroup\ --column
+" Use ag, rg, pt, or ack for grep command if available
+if executable('rg')
+    " ripgrep
+    set grepprg=rg\ --no-heading\ --vimgrep
+    set grepformat=%f:%l:%c:%m
+elseif executable('ag')
+    " The Silver Searcher
+    set grepprg=ag\ --vimgrep
+    set grepformat=%f:%l:%c:%m
+elseif executable('pt')
+    " The Platinum Searcher
+    set grepprg=pt\ --nocolor\ --nogroup\ --column
+    set grepformat=%f:%l:%c:%m
 elseif executable('ack')
     set grepprg=ack\ -H\ --nocolor\ --nogroup
+    set grepformat=%f:%l:%c:%m
 endif
 
 
@@ -338,6 +351,7 @@ endif
 
 " Backup the file only during writing
 set nobackup
+
 if has('writebackup')
     set writebackup
 endif
@@ -346,20 +360,20 @@ set swapfile
 " Put swap files somewhere else to avoid cluttering the current directory
 " A trailing slash for the location makes vim use the full path name in the
 " file name.
-if has('unix')
-    set directory=~/.vim/swap//,.
-else
+if has('win32')
     set directory=~/vimfiles/swap//,.
+else
+    set directory=~/.vim/swap//,.
 endif
 
 " Allow undo even if file is closed and reopened
 if has("persistent_undo")
     set undofile
 
-    if has('unix')
-        set undodir=~/.vim/undo/
-    elseif has('win32')
+    if has('win32')
         set undodir=~/vimfiles/undo/
+    else
+        set undodir=~/.vim/undo/
     endif
 endif
 
