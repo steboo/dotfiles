@@ -2,6 +2,10 @@
 
 if has('win32')
     set guifont=Consolas:h11
+    if has('directx')
+        " Enable ClearType for smoother fonts
+        set renderoptions=type:directx,renmode:5,taamode:1,level:1.0
+    endif
 endif
 
 " Turn off menu tearoffs
