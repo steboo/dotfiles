@@ -97,35 +97,6 @@ if has('autocmd')
     augroup END
 endif
 
-if exists('g:loaded_syntastic_plugin')
-    if has('signs')
-        set signcolumn=yes
-    endif
-
-    set statusline+=%#warningmsg#
-    set statusline+=%{SyntasticStatuslineFlag()}
-    set statusline+=%*
-
-    let g:syntastic_always_populate_loc_list = 1
-    let g:syntastic_loc_list_height = 5
-    let g:syntastic_auto_loc_list = 0
-    let g:syntastic_check_on_open = 1
-    let g:syntastic_check_on_wq = 1
-
-    highlight link SyntasticErrorSign SignColumn
-    highlight link SyntasticWarningSign SignColumn
-    highlight link SyntasticStyleErrorSign SignColumn
-    highlight link SyntasticStyleWarningSign SignColumn
-
-    let g:syntastic_javascript_checkers = ['eslint']
-    if has('autocmd')
-        augroup filetype_javascript_eslint
-            autocmd!
-            autocmd FileType javascript if executable('node_modules/.bin/eslint') | let g:syntastic_javascript_eslint_exec = 'node_modules/.bin/eslint' | endif
-        augroup END
-    endif
-endif
-
 
 " --------------
 " Line endings
@@ -242,7 +213,7 @@ endif
 " Let vim figure out the correct value of t_Co
 " (Hint: check value of $TERM if there are less colors than expected)
 
-if &t_Co < 256
+if &t_Co < 256 && !has('gui_running')
     " Use a basic color scheme for terminals lacking in colors
     try
         colorscheme pablo
@@ -259,29 +230,32 @@ else
         let g:solarized_termcolors=256
     endif
 
-    " Colors need to be in ~/.vim/colors (or %HOME%\vimfiles\colors)
-    " Fall back to something built-in if it's missing
-    try
-        " solarized dark does not have high enough contrast for me
-        "colorscheme solarized
+    " Don't try to set the colors again if are running the GUI
+    if !has('gui_running') || !exists('g:colors_name')
+      " Colors need to be in ~/.vim/colors (or %HOME%\vimfiles\colors)
+      " Fall back to something built-in if it's missing
+      try
+          " solarized dark does not have high enough contrast for me
+          "colorscheme solarized
 
-        " molokai and badwolf use bold fonts which do not display nicely in
-        " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
-        " http://stackoverflow.com/a/2581889/25295)
-        "colorscheme molokai
-        "colorscheme badwolf
+          " molokai and badwolf use bold fonts which do not display nicely in
+          " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
+          " http://stackoverflow.com/a/2581889/25295)
+          "colorscheme molokai
+          "colorscheme badwolf
 
-        "colorscheme Tomorrow-Night
-        colorscheme railscasts
-    catch /^Vim\%((\a\+)\)\=:E185/
-        try
-            colorscheme pablo
-        catch /^Vim\%((\a\+)\)\=:E185/
-        endtry
+          "colorscheme Tomorrow-Night
+          colorscheme railscasts
+      catch /^Vim\%((\a\+)\)\=:E185/
+          try
+              colorscheme pablo
+          catch /^Vim\%((\a\+)\)\=:E185/
+          endtry
 
-        set nocursorline
-        set laststatus=1
-    endtry
+          set nocursorline
+          set laststatus=1
+      endtry
+    endif
 endif
 
 
