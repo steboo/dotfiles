@@ -51,13 +51,13 @@ if has('multi_byte')
     if has('gui_gtk2')
         " The help file recommends setting the encoding for GTK+ 2 to utf-8.
         set encoding=utf-8
-    elseif has('gui_running') && &encoding ==# 'latin1'
+    elseif has('gui_running') && has('win32') && &encoding ==# 'latin1'
         " We want vim to support Unicode.
         set encoding=utf-8
     endif
 
-    " Use of a BOM in UTF-8 is not recommended. However, the BOM is highly
-    " recommended (by me) for other multi-byte encodings
+    " Default to no BOM, since most files are UTF-8. Note that this will remove
+    " BOMs from open files if you source $MYVIMRC.
     if &encoding ==# 'utf-8'
         set nobomb
     endif
@@ -79,17 +79,14 @@ endif
 filetype plugin indent on
 
 if has('autocmd')
-    augroup filetype_format_exceptions
+    augroup filetype_textwidth_exceptions
         autocmd!
 
-        " Try to adhere to PEP-8 for Python
-        autocmd FileType python setlocal shiftwidth=4 tabstop=4 textwidth=79
+        " PEP 8 specifies 79 as the maximum line length in Python
+        autocmd FileType python setlocal textwidth=79
 
-        " Try to adhere to PSR-2 for PHP
-        autocmd FileType php setlocal shiftwidth=4 tabstop=4 textwidth=120
-
-        " Try to adhere to perlstyle for Perl
-        autocmd FileType perl setlocal shiftwidth=4 tabstop=4
+        " PSR-2 specifies 120 as the soft limit for line length in PHP
+        autocmd FileType php setlocal textwidth=120
 
         " Scala - many style guides (Kafka, Spark, Twitter) suggest a column
         " limit of 100
