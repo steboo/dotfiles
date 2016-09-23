@@ -39,9 +39,7 @@ if [ $useinternet ]; then
   curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
 
   pushd ~/.vim/bundle
-  git clone git://github.com/altercation/vim-colors-solarized.git
   git clone git://github.com/tpope/vim-dispatch.git
-  git clone git://github.com/PProvost/vim-ps1.git
   git clone git://github.com/jpo/vim-railscasts-theme.git
   popd
 fi
