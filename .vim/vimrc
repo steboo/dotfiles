@@ -1,16 +1,13 @@
 " .vimrc
 "
-" A widely compatible vim 7+ initialization file. Useful if one needs to log
-" into a wide variety of machines that might not have all of the features that
-" exist on a primary developer machine.
+" A widely compatible vim 7.0 and higher initialization file. Useful if one
+" needs to log into a wide variety of machines that might not have all of the
+" features that exist on a primary developer machine.
 "
-" Tested on
-"  * VIM 7.0 Tiny Linux
-"  * VIM 7.2 Huge Linux
-"  * VIM 7.4 Huge Linux
-"  * VIM 7.4 Big Win32
-"  * GVIM 7.4 Big Win32
-"  * GVIM 8.0 Huge Win32
+" Goals
+"  * Same vimrc everywhere regardless of OS or vim version.
+"  * Graceful degradation if a feature, plugin or colorscheme is missing.
+"  * Embrace native vim features and keystrokes over plugins.
 
 " -----------------
 " Editor behavior
@@ -19,12 +16,12 @@
 " Tabs or whitespace
 set expandtab
 set smarttab
-set shiftwidth=2
 set tabstop=2
-set textwidth=80
+set shiftwidth=0 " Use tabstop value
 
 " Indentation
 set autoindent
+
 if has('cindent')
     set cindent
 elseif has('smartindent')
@@ -36,9 +33,6 @@ if v:version > 703 || v:version == 703 && has('patch541')
     set formatoptions+=j
 endif
 
-" Do not automatically wrap lines
-set nowrap
-
 
 " ----------
 " Encoding
@@ -46,13 +40,14 @@ set nowrap
 
 " On Windows, encoding will default to latin1 (code page 1252). To support
 " Unicode files, we'll want to change this to something in Unicode.
-" On Linux, encoding will default to something based on $LANG (typically utf-8)
+" On Linux, encoding will default to something based on $LANG (typically
+" utf-8).
 if has('multi_byte')
     if has('gui_gtk2')
-        " The help file recommends setting the encoding for GTK+ 2 to utf-8.
+        " The help file recommends setting the encoding for GTK+ 2 to utf-8
         set encoding=utf-8
     elseif has('gui_running') && has('win32') && &encoding ==# 'latin1'
-        " We want vim to support Unicode.
+        " Default to unicode in Windows GUI
         set encoding=utf-8
     endif
 
@@ -77,22 +72,6 @@ endif
 
 " Use filetype detection and plugin/indent files
 filetype plugin indent on
-
-if has('autocmd')
-    augroup filetype_textwidth_exceptions
-        autocmd!
-
-        " PEP 8 specifies 79 as the maximum line length in Python
-        autocmd FileType python setlocal textwidth=79
-
-        " PSR-2 specifies 120 as the soft limit for line length in PHP
-        autocmd FileType php setlocal textwidth=120
-
-        " Scala - many style guides (Kafka, Spark, Twitter) suggest a column
-        " limit of 100
-        autocmd FileType scala setlocal textwidth=100
-    augroup END
-endif
 
 
 " --------------
@@ -168,14 +147,14 @@ if has('linebreak')
     set linebreak
 endif
 
-" Show trailing characters, but don't show anything for non-trailing tabs
+" Show trailing characters, but don't show anything for non-trailing tabs.
 " (Hint: to use a Unicode character, vim must be using a Unicode encoding.)
 if has('multi_byte') && &encoding ==# 'utf-8'
     set listchars=tab:\ \ ,trail:·
 endif
 
-" Trailing characters are distracting while editing the current line.
-" Instead, show them if toggled.
+" Trailing characters are distracting while editing the current line. Instead,
+" show them if toggled.
 map <leader>es :setlocal list!<cr>
 
 " Matching braces
@@ -207,52 +186,51 @@ if has('syntax') && !exists('g:syntax_on')
     syntax enable
 endif
 
-" Let vim figure out the correct value of t_Co
-" (Hint: check value of $TERM if there are less colors than expected)
+" Let vim figure out the correct value of t_Co.
+" (Hint: check value of $TERM or terminfo if there are less colors than
+" expected.)
 
-if &t_Co < 256 && !has('gui_running')
+if has('gui_running') || &t_Co >= 256 
+    " Don't try to set the colors again if we are running the GUI.
+    " (This is a nicety for sourcing $MYVIMRC when gvimrc uses a different
+    " colorscheme than vimrc.)
+    if !has('gui_running') || !exists('g:colors_name')
+        " Colors need to be in ~/.vim/colors (Windows: %HOME%\vimfiles\colors)
+        " or loaded by Pathogen.
+        try
+            " solarized dark does not have high enough contrast for me
+            "colorscheme solarized
+
+            " molokai and badwolf use bold fonts which do not display nicely in
+            " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
+            " http://stackoverflow.com/a/2581889/25295)
+            "colorscheme molokai
+            "colorscheme badwolf
+
+            "colorscheme Tomorrow-Night
+            colorscheme railscasts
+        catch /^Vim\%((\a\+)\)\=:E185/
+            " Attempt to use a default colorscheme if our preferred is not
+            " available.
+            try
+                colorscheme darkblue
+            catch /^Vim\%((\a\+)\)\=:E185/
+            endtry
+
+            set nocursorline
+            set laststatus=1
+        endtry
+    endif
+else
     " Use a basic color scheme for terminals lacking in colors
     try
-        colorscheme pablo
+        colorscheme darkblue
     catch /^Vim\%((\a\+)\)\=:E185/
     endtry
 
     " cursorline looks terrible with low colors
     set nocursorline
     set laststatus=1
-else
-    if &t_Co == 256
-        " The README for solarized recommends that this should be set for those
-        " who don't change their terminal colors.
-        let g:solarized_termcolors=256
-    endif
-
-    " Don't try to set the colors again if are running the GUI
-    if !has('gui_running') || !exists('g:colors_name')
-      " Colors need to be in ~/.vim/colors (or %HOME%\vimfiles\colors)
-      " Fall back to something built-in if it's missing
-      try
-          " solarized dark does not have high enough contrast for me
-          "colorscheme solarized
-
-          " molokai and badwolf use bold fonts which do not display nicely in
-          " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
-          " http://stackoverflow.com/a/2581889/25295)
-          "colorscheme molokai
-          "colorscheme badwolf
-
-          "colorscheme Tomorrow-Night
-          colorscheme railscasts
-      catch /^Vim\%((\a\+)\)\=:E185/
-          try
-              colorscheme pablo
-          catch /^Vim\%((\a\+)\)\=:E185/
-          endtry
-
-          set nocursorline
-          set laststatus=1
-      endtry
-    endif
 endif
 
 
@@ -261,8 +239,8 @@ endif
 " -------
 
 if has('mouse')
-    " Allow mouse in all modes except insert if it's supported
-    " (Hold down shift to copy)
+    " Allow mouse in all modes except insert if it's supported.
+    " (Hold down shift to copy in PuTTY.)
     set mouse=nvc
     set mousehide
 
@@ -273,12 +251,41 @@ if has('mouse')
 endif
 
 
+" ---------
+" Pasting
+" ---------
+
+" Bracketed paste removes need to toggle paste mode.
+" based on an answer by Chris Page on Stack Overflow
+" http://stackoverflow.com/a/7053522
+if !exists('g:bracketed_paste')
+    let g:bracketed_paste = 1
+    let &t_ti .= "\e[?2004h"
+    let &t_te = "\e[?2004l" . &t_te
+endif
+
+function! XTermPasteBegin(ret)
+    set pastetoggle=<Esc>[201~
+    set paste
+    return a:ret
+endfunction
+
+map <expr> <Esc>[200~ XTermPasteBegin('i')
+imap <expr> <Esc>[200~ XTermPasteBegin('')
+vmap <expr> <Esc>[200~ XTermPasteBegin('c')
+cmap <Esc>[200~ <Nop>
+cmap <Esc>[201~ <Nop>
+
+" Shortcut for setting paste mode
+set pastetoggle=<leader>pp
+
+
 " ----------------
 " Shell commands
 " ----------------
 
 " Use PowerShell for commands on Windows
-if has('win32')
+if has('win32') && executable(expand('$WINDIR/System32/WindowsPowerShell/v1.0/powershell.exe'))
     set shell=$WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe\ -NoLogo
     set shellcmdflag=-Command
     set shellquote=\"
@@ -311,7 +318,7 @@ endif
 " Don't recognize octal for CTRL-A and CTRL-X
 set nrformats-=octal
 
-" Prefer stronger encryption
+" Prefer stronger encryption (don't actually use this for confidential data)
 if v:version > 704 || v:version == 704 && has('patch237') && has('patch401')
     set cryptmethod=blowfish2
 elseif v:version >= 703
@@ -338,7 +345,7 @@ else
 endif
 
 " Allow undo even if file is closed and reopened
-if has("persistent_undo")
+if has('persistent_undo')
     set undofile
 
     if has('win32')
@@ -348,12 +355,9 @@ if has("persistent_undo")
     endif
 endif
 
-" Shortcut for setting paste mode
-map <leader>pp :setlocal paste!<cr>
-
 " Avoid accidentally opening up a help window
-map <F1> <nop>
-imap <F1> <nop>
+map <F1> <Nop>
+imap <F1> <Nop>
 
 " Avoid accidentally opening Ex mode
 map Q <Nop>
@@ -375,4 +379,4 @@ endif
 
 set secure
 
-" vim:set et sw=4:
+" vim:set et sw=4 ts=4:
