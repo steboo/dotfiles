@@ -245,7 +245,7 @@ if has('mouse')
     set mousehide
 
     " Resize buffers with mouse in tmux/screen
-    if has('mouse_xterm') && &term ==# 'screen-256color'
+    if has('mouse_xterm') && (&term ==# 'screen-256color' || &term ==# 'putty-256color')
         set ttymouse=xterm2
     endif
 endif
