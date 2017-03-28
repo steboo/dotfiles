@@ -22,12 +22,6 @@ set shiftwidth=0 " Use tabstop value
 " Indentation
 set autoindent
 
-if has('cindent')
-    set cindent
-elseif has('smartindent')
-    set smartindent
-endif
-
 " Join comment lines
 if v:version > 703 || v:version == 703 && has('patch541')
     set formatoptions+=j
