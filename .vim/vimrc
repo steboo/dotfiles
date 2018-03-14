@@ -122,7 +122,7 @@ set whichwrap+=<,>
 
 " Ignore compiled files for tab completion
 if has('wildignore')
-    set wildignore+=*.o,*~,*.pyc,*.pyo
+    set wildignore+=*.o,*~,*.pyc,*.pyo,*.exe
 endif
 
 if has('wildmenu')
