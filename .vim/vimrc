@@ -9,6 +9,12 @@
 "  * Graceful degradation if a feature, plugin or colorscheme is missing.
 "  * Embrace native vim features and keystrokes over plugins.
 
+if has('win32')
+    let g:home_vimfiles = $HOME . '/vimfiles'
+else
+    let g:home_vimfiles = $HOME . '/.vim'
+endif
+
 " -----------------
 " Editor behavior
 " -----------------
@@ -58,9 +64,7 @@ endif
 " ---------
 
 " Pathogen - https://github.com/tpope/vim-pathogen
-if has('win32') && filereadable(expand('~/vimfiles/autoload/pathogen.vim'))
-    execute pathogen#infect()
-elseif filereadable(expand('~/.vim/autoload/pathogen.vim'))
+if filereadable(expand(g:home_vimfiles . '/autoload/pathogen.vim'))
     execute pathogen#infect()
 endif
 
@@ -175,6 +179,17 @@ set history=1000
 set cursorline
 set scrolloff=3
 
+
+" Use true colors where available, but don't bother if we are in a TTY. Newer
+" versions of Linux will simply approximate this back to the closest basic
+" color.
+if &term !=# 'linux' && has('termguicolors')
+    set termguicolors
+    let &t_8f = "\e[38;2;%lu;%lu;%lum"
+    let &t_8b = "\e[48;2;%lu;%lu;%lum"
+endif
+
+
 " Syntax color
 if has('syntax') && !exists('g:syntax_on')
     syntax enable
@@ -207,24 +222,24 @@ if has('gui_running') || &t_Co >= 256
             " Attempt to use a default colorscheme if our preferred is not
             " available.
             try
-                colorscheme darkblue
+                colorscheme slate
+
+                set nocursorline
             catch /^Vim\%((\a\+)\)\=:E185/
             endtry
-
-            set nocursorline
-            set laststatus=1
         endtry
     endif
 else
     " Use a basic color scheme for terminals lacking in colors
-    try
-        colorscheme darkblue
-    catch /^Vim\%((\a\+)\)\=:E185/
-    endtry
+    if !exists('g:colors_name')
+        " Use a built-in scheme
+        try
+            colorscheme slate
 
-    " cursorline looks terrible with low colors
-    set nocursorline
-    set laststatus=1
+            set nocursorline
+        catch /^Vim\%((\a\+)\)\=:E185/
+        endtry
+    endif
 endif
 
 
@@ -250,11 +265,11 @@ endif
 " ---------
 
 " Bracketed paste removes need to toggle paste mode.
-" based on an answer by Chris Page on Stack Overflow
-" http://stackoverflow.com/a/7053522
-if !exists('g:bracketed_paste')
-    let g:bracketed_paste = 1
+if &t_ti !~ "\e[?2004h"
     let &t_ti .= "\e[?2004h"
+endif
+
+if &t_te !~ "\e[?2004l"
     let &t_te = "\e[?2004l" . &t_te
 endif
 
@@ -321,32 +336,35 @@ elseif v:version >= 703
     set cryptmethod=blowfish
 endif
 
+" Mitigation for CVE-2017-1000382. This function should be called for backup,
+" swap, and undo directories (if enabled).
+function! CreatePrivateDir(path)
+    if !isdirectory(expand(a:path))
+        call mkdir(expand(a:path), 'p', 0700)
+    endif
+endfunction
+
 " Backup the file only during writing
 set nobackup
 
 if has('writebackup')
     set writebackup
+    let &backupdir = g:home_vimfiles . '/backup//'
+    call CreatePrivateDir(&backupdir)
 endif
 
 set swapfile
 " Put swap files somewhere else to avoid cluttering the current directory
 " A trailing slash for the location makes vim use the full path name in the
 " file name.
-if has('win32')
-    set directory=~/vimfiles/swap//,.
-else
-    set directory=~/.vim/swap//,.
-endif
+let &directory = g:home_vimfiles . '/swap//'
+call CreatePrivateDir(&directory)
 
 " Allow undo even if file is closed and reopened
 if has('persistent_undo')
     set undofile
-
-    if has('win32')
-        set undodir=~/vimfiles/undo/
-    else
-        set undodir=~/.vim/undo/
-    endif
+    let &undodir = g:home_vimfiles . '/undo//'
+    call CreatePrivateDir(&undodir)
 endif
 
 " Avoid accidentally opening up a help window
@@ -365,10 +383,8 @@ let g:netrw_list_hide='.*\.swp$,\~$'
 " Load machine-specific settings
 if filereadable(expand('~/.vimrc.local'))
     source $HOME/.vimrc.local
-elseif has('win32') && filereadable(expand('~/vimfiles/vimrc.local'))
-    source $HOME/vimfiles/vimrc.local
-elseif filereadable(expand('~/.vim/vimrc.local'))
-    source $HOME/.vim/vimrc.local
+elseif filereadable(expand(g:home_vimfiles . '/vimrc.local'))
+    source g:home_vimfiles . /vimrc.local
 endif
 
 set secure

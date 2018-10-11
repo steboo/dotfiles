@@ -17,8 +17,8 @@ mkdir -p ~/.vim/autoload
 mkdir -p ~/.vim/bundle
 mkdir -p ~/.vim/colors
 mkdir -p ~/.vim/indent
-mkdir -p ~/.vim/swap
-mkdir -p ~/.vim/undo
+mkdir -p -m 700 ~/.vim/swap
+mkdir -p -m 700 ~/.vim/undo
 
 cp .vim/vimrc ~/.vim/vimrc
 cp .vim/gvimrc ~/.vim/gvimrc
