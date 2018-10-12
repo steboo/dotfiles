@@ -184,14 +184,17 @@ set history=1000
 set cursorline
 set scrolloff=3
 
-" Use true colors where available, but don't bother if we are in a TTY. Newer
-" versions of Linux will simply approximate this back to the closest basic
-" color.
-if &term !=# 'linux' && &term !=# 'screen.linux' && &term !=# 'screen' && has('termguicolors')
-    set termguicolors
-    let &t_8f = "\e[38;2;%lu;%lu;%lum"
-    let &t_8b = "\e[48;2;%lu;%lu;%lum"
-endif
+" As of late 2018, true color support is hard to detect. Even if a copy of vim
+" supports it, it doesn't necessarily mean that the underlying terminal
+" emulator also supports it. Some terminal emulators fully support it, some
+" approximate it, and some have not yet added support (or released it in a
+" stable build). If your terminal emulator supports true color / 24-bit color,
+" you can uncomment the following lines:
+"if has('termguicolors')
+"    set termguicolors
+"    let &t_8f = "\e[38;2;%lu;%lu;%lum"
+"    let &t_8b = "\e[48;2;%lu;%lu;%lum"
+"endif
 
 " Syntax color
 if has('syntax') && !exists('g:syntax_on')
