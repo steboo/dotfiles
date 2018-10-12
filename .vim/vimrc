@@ -9,6 +9,10 @@
 "  * Graceful degradation if a feature, plugin or colorscheme is missing.
 "  * Embrace native vim features and keystrokes over plugins.
 
+" ------------------
+" Define variables
+" -----------------
+
 if has('win32')
     let g:home_vimfiles = $HOME . '/vimfiles'
 else
@@ -91,6 +95,7 @@ if has('autocmd')
         autocmd FileType dosbatch setlocal fileformat=dos
     augroup END
 endif
+
 
 " -----------------
 " Search behavior
@@ -179,67 +184,65 @@ set history=1000
 set cursorline
 set scrolloff=3
 
-
 " Use true colors where available, but don't bother if we are in a TTY. Newer
 " versions of Linux will simply approximate this back to the closest basic
 " color.
-if &term !=# 'linux' && has('termguicolors')
+if &term !=# 'linux' && &term !=# 'screen.linux' && &term !=# 'screen' && has('termguicolors')
     set termguicolors
     let &t_8f = "\e[38;2;%lu;%lu;%lum"
     let &t_8b = "\e[48;2;%lu;%lu;%lum"
 endif
-
 
 " Syntax color
 if has('syntax') && !exists('g:syntax_on')
     syntax enable
 endif
 
-" Let vim figure out the correct value of t_Co.
+" We never set t_Co. Instead, let vim figure out the correct value of t_Co.
 " (Hint: check value of $TERM or terminfo if there are less colors than
 " expected.)
 
 if has('gui_running') || &t_Co >= 256 
-    " Don't try to set the colors again if we are running the GUI.
-    " (This is a nicety for sourcing $MYVIMRC when gvimrc uses a different
-    " colorscheme than vimrc.)
-    if !has('gui_running') || !exists('g:colors_name')
-        " Colors need to be in ~/.vim/colors (Windows: %HOME%\vimfiles\colors)
-        " or loaded by Pathogen.
-        try
-            " solarized dark does not have high enough contrast for me
-            "colorscheme solarized
+    " Colors need to be in ~/.vim/colors (Windows: %HOME%\vimfiles\colors)
+    " or loaded by Pathogen.
+    try
+        " solarized dark does not have high enough contrast for me
+        "colorscheme solarized
 
-            " molokai and badwolf use bold fonts which do not display nicely in
-            " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
-            " http://stackoverflow.com/a/2581889/25295)
-            "colorscheme molokai
-            "colorscheme badwolf
+        " molokai and badwolf use bold fonts which do not display nicely in
+        " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
+        " http://stackoverflow.com/a/2581889/25295)
+        "colorscheme molokai
+        "colorscheme badwolf
 
-            "colorscheme Tomorrow-Night
-            colorscheme railscasts
-        catch /^Vim\%((\a\+)\)\=:E185/
-            " Attempt to use a default colorscheme if our preferred is not
-            " available.
-            try
-                colorscheme slate
-
-                set nocursorline
-            catch /^Vim\%((\a\+)\)\=:E185/
-            endtry
-        endtry
-    endif
-else
-    " Use a basic color scheme for terminals lacking in colors
-    if !exists('g:colors_name')
-        " Use a built-in scheme
+        "colorscheme Tomorrow-Night
+        colorscheme railscasts
+    catch /^Vim\%((\a\+)\)\=:E185/
+        " Attempt to use an included colorscheme if our preferred is not
+        " available.
         try
             colorscheme slate
 
-            set nocursorline
+            " In some terminal emulators, the cursorline looks terrible if
+            " we've fallen into this block.
+            if &term !=# 'linux' && &term !=# 'screen.linux' && &term !=# 'screen'
+                set nocursorline
+            endif
         catch /^Vim\%((\a\+)\)\=:E185/
         endtry
-    endif
+    endtry
+else
+    " Use a basic color scheme for terminals lacking in colors
+    try
+        colorscheme slate
+
+        " In some terminal emulators, the cursorline looks terrible if we've
+        " fallen into this block.
+        if &term !=# 'linux' && &term !=# 'screen.linux' && &term !=# 'screen'
+            set nocursorline
+        endif
+    catch /^Vim\%((\a\+)\)\=:E185/
+    endtry
 endif
 
 
@@ -384,7 +387,7 @@ let g:netrw_list_hide='.*\.swp$,\~$'
 if filereadable(expand('~/.vimrc.local'))
     source $HOME/.vimrc.local
 elseif filereadable(expand(g:home_vimfiles . '/vimrc.local'))
-    source g:home_vimfiles . /vimrc.local
+    execute 'source ' . g:home_vimfiles . '/vimrc.local'
 endif
 
 set secure

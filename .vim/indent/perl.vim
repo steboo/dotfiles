@@ -1,4 +1,4 @@
-# Perl - http://perldoc.perl.org/perlstyle.html
+" Perl - http://perldoc.perl.org/perlstyle.html
 
 setlocal expandtab
 setlocal tabstop=4

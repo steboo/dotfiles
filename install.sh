@@ -14,6 +14,7 @@ done
 
 mkdir -p ~/.vim
 mkdir -p ~/.vim/autoload
+mkdir -p -m 700 ~/.vim/backup
 mkdir -p ~/.vim/bundle
 mkdir -p ~/.vim/colors
 mkdir -p ~/.vim/indent
@@ -43,4 +44,3 @@ if [ $useinternet ]; then
   git clone git://github.com/jpo/vim-railscasts-theme.git
   popd
 fi
-
