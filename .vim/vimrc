@@ -224,7 +224,7 @@ if has('gui_running') || &t_Co >= 256
         " Attempt to use an included colorscheme if our preferred is not
         " available.
         try
-            colorscheme slate
+            colorscheme elflord
 
             " In some terminal emulators, the cursorline looks terrible if
             " we've fallen into this block.
@@ -237,7 +237,7 @@ if has('gui_running') || &t_Co >= 256
 else
     " Use a basic color scheme for terminals lacking in colors
     try
-        colorscheme slate
+        colorscheme elflord
 
         " In some terminal emulators, the cursorline looks terrible if we've
         " fallen into this block.
