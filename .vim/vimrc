@@ -271,25 +271,27 @@ endif
 " ---------
 
 " Bracketed paste removes need to toggle paste mode.
-if &t_ti !~ "\e[?2004h"
-    let &t_ti .= "\e[?2004h"
+if has('eval')
+    if &t_ti !~ "\e[?2004h"
+        let &t_ti .= "\e[?2004h"
+    endif
+
+    if &t_te !~ "\e[?2004l"
+        let &t_te = "\e[?2004l" . &t_te
+    endif
+
+    function! XTermPasteBegin(ret)
+        set pastetoggle=<Esc>[201~
+        set paste
+        return a:ret
+    endfunction
+
+    map <expr> <Esc>[200~ XTermPasteBegin('i')
+    imap <expr> <Esc>[200~ XTermPasteBegin('')
+    vmap <expr> <Esc>[200~ XTermPasteBegin('c')
+    cmap <Esc>[200~ <Nop>
+    cmap <Esc>[201~ <Nop>
 endif
-
-if &t_te !~ "\e[?2004l"
-    let &t_te = "\e[?2004l" . &t_te
-endif
-
-function! XTermPasteBegin(ret)
-    set pastetoggle=<Esc>[201~
-    set paste
-    return a:ret
-endfunction
-
-map <expr> <Esc>[200~ XTermPasteBegin('i')
-imap <expr> <Esc>[200~ XTermPasteBegin('')
-vmap <expr> <Esc>[200~ XTermPasteBegin('c')
-cmap <Esc>[200~ <Nop>
-cmap <Esc>[201~ <Nop>
 
 " Shortcut for setting paste mode
 set pastetoggle=<leader>pp
@@ -344,33 +346,41 @@ endif
 
 " Mitigation for CVE-2017-1000382. This function should be called for backup,
 " swap, and undo directories (if enabled).
-function! CreatePrivateDir(path)
-    if !isdirectory(expand(a:path))
-        call mkdir(expand(a:path), 'p', 0700)
-    endif
-endfunction
+if has('eval')
+    function! CreatePrivateDir(path)
+        if !isdirectory(expand(a:path))
+            call mkdir(expand(a:path), 'p', 0700)
+        endif
+    endfunction
+endif
 
 " Backup the file only during writing
 set nobackup
 
 if has('writebackup')
     set writebackup
-    let &backupdir = g:home_vimfiles . '/backup//'
-    call CreatePrivateDir(&backupdir)
+    if has('eval')
+        let &backupdir = g:home_vimfiles . '/backup//'
+        call CreatePrivateDir(&backupdir)
+    endif
 endif
 
 set swapfile
 " Put swap files somewhere else to avoid cluttering the current directory
 " A trailing slash for the location makes vim use the full path name in the
 " file name.
-let &directory = g:home_vimfiles . '/swap//'
-call CreatePrivateDir(&directory)
+if has('eval')
+    let &directory = g:home_vimfiles . '/swap//'
+    call CreatePrivateDir(&directory)
+endif
 
 " Allow undo even if file is closed and reopened
 if has('persistent_undo')
     set undofile
-    let &undodir = g:home_vimfiles . '/undo//'
-    call CreatePrivateDir(&undodir)
+    if has('eval')
+      let &undodir = g:home_vimfiles . '/undo//'
+      call CreatePrivateDir(&undodir)
+    endif
 endif
 
 " Avoid accidentally opening up a help window
@@ -384,7 +394,9 @@ map Q <Nop>
 imap kj <Esc>
 
 " Hide swap files and backups from the file explorer
-let g:netrw_list_hide='.*\.swp$,\~$'
+if has('eval')
+    let g:netrw_list_hide='.*\.swp$,\~$'
+endif
 
 " Load machine-specific settings
 if filereadable(expand('~/.vimrc.local'))
