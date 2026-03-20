@@ -25,7 +25,7 @@ set background=light
 let g:solarized_menu=0
 
 " Use solarized light for GUI
-colorscheme solarized
+colorscheme solarized8
 
 set cursorline
 set laststatus=2

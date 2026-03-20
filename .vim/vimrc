@@ -188,13 +188,10 @@ set scrolloff=3
 " supports it, it doesn't necessarily mean that the underlying terminal
 " emulator also supports it. Some terminal emulators fully support it, some
 " approximate it, and some have not yet added support (or released it in a
-" stable build). If your terminal emulator supports true color / 24-bit color,
-" you can uncomment the following lines:
-"if has('termguicolors')
-"    set termguicolors
-"    let &t_8f = "\e[38;2;%lu;%lu;%lum"
-"    let &t_8b = "\e[48;2;%lu;%lu;%lum"
-"endif
+" stable build).
+if has('termguicolors') && $COLORTERM == 'truecolor'
+    set termguicolors
+endif
 
 " Syntax color
 if has('syntax') && !exists('g:syntax_on')
@@ -207,10 +204,11 @@ endif
 
 if has('gui_running') || &t_Co >= 256 
     " Colors need to be in ~/.vim/colors (Windows: %HOME%\vimfiles\colors)
-    " or loaded by Pathogen.
+    " or loaded by Pathogen or the vim package manager.
     try
-        " solarized dark does not have high enough contrast for me
-        "colorscheme solarized
+        " solarized, and its derivatives like solarized8 and solarized8_high
+        " continue to be too low contrast for me in dark mode.
+        "colorscheme solarized8_high
 
         " molokai and badwolf use bold fonts which do not display nicely in
         " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
@@ -224,7 +222,7 @@ if has('gui_running') || &t_Co >= 256
         " Attempt to use an included colorscheme if our preferred is not
         " available.
         try
-            colorscheme elflord
+            colorscheme slate
 
             " In some terminal emulators, the cursorline looks terrible if
             " we've fallen into this block.
