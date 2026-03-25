@@ -1,8 +1,8 @@
 " .vimrc
 "
 " A widely compatible vim 7.0 and higher initialization file. Useful if one
-" needs to log into a wide variety of machines that might not have all of the
-" features that exist on a primary developer machine.
+" needs to log into a wide variety of machines and containers that might not
+" have all of the features that exist on a primary developer machine.
 "
 " Goals
 "  * Same vimrc everywhere regardless of OS or vim version.
@@ -184,34 +184,27 @@ set history=1000
 set cursorline
 set scrolloff=3
 
-" We never set t_Co. Instead, let vim figure out the correct value of t_Co.
-" (Hint: check value of $TERM or terminfo if there are less colors than
-" expected.)
-
-if has('termguicolors') && &t_Co >= 256
-  set termguicolors
-endif
+" In 2026, there is no reliable way to detect whether a terminal emulator
+" supports 24-bit color (truecolor). $COLORTERM will lie. If you know your
+" terminal supports 24-bit color, you can uncomment the following lines.
+"if has('termguicolors') && &t_Co >= 256
+"  set termguicolors
+"endif
 
 " Syntax color
 if has('syntax') && !exists('g:syntax_on')
   syntax enable
 endif
 
+" We never set t_Co. Instead, let vim figure out the correct value of t_Co.
 if has('gui_running') || &t_Co >= 256 
   " Colors need to be in ~/.vim/colors (Windows: %HOME%\vimfiles\colors)
   " or loaded by Pathogen or the vim package manager.
   try
-    " solarized, and its derivatives like solarized8 and solarized8_high
-    " continue to be too low contrast for me in dark mode.
-    "colorscheme solarized8_high
+    " Some colorschemes use bold fonts which do not display nicely in some
+    " versions PuTTY with Consolas + ClearType. (Note: PuTTY can be patched,
+    " see http://stackoverflow.com/a/2581889/25295)
 
-    " molokai and badwolf use bold fonts which do not display nicely in
-    " PuTTY with Consolas + ClearType. (Note: PuTTY can be patched, see
-    " http://stackoverflow.com/a/2581889/25295)
-    "colorscheme molokai
-    "colorscheme badwolf
-
-    "colorscheme Tomorrow-Night
     colorscheme railscasts
   catch /^Vim\%((\a\+)\)\=:E185/
     " Attempt to use an included colorscheme if our preferred is not
@@ -225,9 +218,6 @@ else
   " Use a basic color scheme for terminals lacking in colors
   try
     colorscheme elflord
-
-    " In some terminal emulators, the cursorline looks terrible if we've
-    " fallen into this block.
     set nocursorline
   catch /^Vim\%((\a\+)\)\=:E185/
   endtry
@@ -245,11 +235,11 @@ if has('mouse')
   set mousehide
 
   " Generally we rely on vim to correctly set ttymouse (usually to sgr).
-  " For screen, we may need to help vim.
-  if has('mouse_xterm') && (&term ==# 'screen-256color' || &term ==# 'putty-256color')
-    "# Resize buffers with mouse in screen.
-    set ttymouse=xterm2
-  endif
+  " tmux 3.0+ and GNU Screen 4.7+ support SGR. For older versions of vim, we
+  " need to uncomment the following lines to use the mouse.
+  "if has('mouse_xterm')
+  "  set ttymouse=xterm2
+  "endif
 endif
 
 
@@ -274,18 +264,10 @@ if has('win32') && executable(expand('$WINDIR/System32/WindowsPowerShell/v1.0/po
   set shellxquote=
 endif
 
-" Use ag, rg, pt, or ack for grep command if available
+" Use rg or ack for grep command if available
 if executable('rg')
   " ripgrep
   set grepprg=rg\ --no-heading\ --vimgrep
-  set grepformat=%f:%l:%c:%m
-elseif executable('ag')
-  " The Silver Searcher
-  set grepprg=ag\ --vimgrep
-  set grepformat=%f:%l:%c:%m
-elseif executable('pt')
-  " The Platinum Searcher
-  set grepprg=pt\ --nocolor\ --nogroup\ --column
   set grepformat=%f:%l:%c:%m
 elseif executable('ack')
   set grepprg=ack\ -H\ --nocolor\ --nogroup
